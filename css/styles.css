@@ -1,0 +1,10 @@
+body {
+  background: url("../assets/wp1858727.jpg") 0 0 no-repeat;
+  background-size: cover;
+}
+
+canvas {
+  padding: 0;
+    margin: auto;
+    display: block;
+}

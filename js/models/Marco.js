@@ -10,7 +10,7 @@ class Marco extends GameObject {
     this.img.onload = function(){
       //this.stand();
     }.bind(this);
-
+    this.isJumping = false;
     this.shoots = [];
   }
 
@@ -26,7 +26,7 @@ class Marco extends GameObject {
     this.intervalID = setInterval(() => {
 
       if (position < 100) {
-        this.context.clearRect(this.x, this.canvas.height - 150,80,80);
+        this.context.clearRect(this.x, this.y,80,80);
         this.context.drawImage(this.img, position,this.imgY,35,52,this.x,this.y,60,80);
         this.width = 35;
         position = position + diff;
@@ -43,16 +43,16 @@ class Marco extends GameObject {
     let diff = 32;
     //this.context.drawImage(this.img, position,280,35,52,200,this.canvas.height - 140,50,70);
     this.intervalID = setInterval(() => {
-      this.context.clearRect(this.x, this.canvas.height - 150,100,100);
+      this.context.clearRect(this.x, this.y,100,100);
       this.x+=8;
       if (position < 100) {
-        this.context.drawImage(this.img, position,280,35,52,this.x,this.canvas.height - 150,60,80);
+        this.context.drawImage(this.img, position,280,35,52,this.x,this.y,60,80);
         position = position + diff;
       } else if (position < 190) {
-        this.context.drawImage(this.img, position - 3,280,35,52,this.x,this.canvas.height - 150,60,80);
+        this.context.drawImage(this.img, position - 3,280,35,52,this.x,this.y,60,80);
         position = position + 30;
       }else if (position < 230) {
-        this.context.drawImage(this.img, position + 4,280,35,52,this.x,this.canvas.height - 150,60,90);
+        this.context.drawImage(this.img, position + 4,280,35,52,this.x,this.y,60,90);
         position = position + 32;
       } else {
         position = 10;
@@ -61,27 +61,65 @@ class Marco extends GameObject {
     }, interval);
   }
 
-  shoot() {
+  jump() {
     let position = 8;
-    let interval = 1000/14;
+    let interval = 50;
     let diff = 32;
     let xPrite = 225;
+    this.isJumping = true;
     this.intervalID = setInterval(() => {
-      this.context.clearRect(this.x, this.canvas.height - 150,100,100);
-      if (position < 200) {
-        this.context.drawImage(this.img, position,xPrite,35,52,this.x,this.canvas.height - 150,60,80);
-        position = position + diff;
-      } else if (position == 200) {
-        this.context.drawImage(this.img, position + 3,xPrite,35,52,this.x,this.canvas.height - 150,60,80);
-        position = position + diff;
-      } else {
-        this.shooting();
+
+      this.context.clearRect(this.x, this.y,100,100);
+      this.y-= 10 * 2;
+      this.context.drawImage(this.img, position,xPrite,35,52,this.x,this.y,60,80);
+      if (this.y < 200 ) {
+        this.jumpDown();
       }
     }, interval);
   }
 
-  shooting() {
+  jumpDown() {
     this.stop();
+    let position = 8;
+    let interval = 50;
+    let diff = 32;
+    let xPrite = 225;
+    this.intervalID = setInterval(() => {
+      this.context.clearRect(this.x, this.y,100,100);
+      this.y+= 10 * 2;
+      this.context.drawImage(this.img, position,xPrite,35,52,this.x,this.y,60,80);
+      if (this.y >=  this.canvas.height - 150){
+        this.isJumping = false;
+        this.stop();
+        this.stand();
+      }
+    }, interval);
+  }
+
+  shoot() {
+    if (!this.isJumping) {
+      let position = 8;
+      let interval = 1000/14;
+      let diff = 32;
+      let xPrite = 225;
+      this.intervalID = setInterval(() => {
+        this.context.clearRect(this.x, this.y,100,100);
+        if (position < 200) {
+          this.context.drawImage(this.img, position,xPrite,35,52,this.x,this.y,60,80);
+          position = position + diff;
+        } else if (position == 200) {
+          this.context.drawImage(this.img, position + 3,xPrite,35,52,this.x,this.y,60,80);
+          position = position + diff;
+        } else {
+          this.shooting();
+        }
+      }, interval);
+    }
+  }
+
+  shooting() {
+    if (!this.isJumping)
+      this.stop();
     let position = 450;
     let interval = 1000/14;
     let diff = 55;
@@ -91,19 +129,21 @@ class Marco extends GameObject {
     this.shoots.push(shot);
 
     this.intervalID = setInterval(() => {
-      this.context.clearRect(this.x, this.canvas.height - 150,90,120);
+      this.context.clearRect(this.x, this.y,90,120);
       if (position < 600) {
-        this.context.drawImage(this.img, position,xPrite,60,80,this.x,this.canvas.height - 150,90,120);
+        this.context.drawImage(this.img, position,xPrite,60,80,this.x,this.y,90,120);
         position = position + diff;
       } else if(position < 750) {
-        this.context.drawImage(this.img, position + 5,xPrite,40,60,this.x,this.canvas.height - 150,60,90);
+        this.context.drawImage(this.img, position + 5,xPrite,40,60,this.x,this.y,60,90);
         position = position + 42;
       }else if(position < 790){
-        this.context.drawImage(this.img, position,xPrite,40,60,this.x,this.canvas.height - 150,60,90);
+        this.context.drawImage(this.img, position,xPrite,40,60,this.x,this.y,60,90);
         position = position + 42;
       }else {
-        this.stop();
-        this.stand();
+        if (!this.isJumping) {
+          this.stop();
+          this.stand();
+        }
       }
     }, interval);
   }

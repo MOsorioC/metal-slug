@@ -5,6 +5,7 @@ let tarma = new Marco();
 
 let isPressed = false;
 let isShooting = false;
+let isJumping = false;
 
 window.onload = function () {
 
@@ -16,19 +17,32 @@ window.onload = function () {
       if (!isPressed) {
           isPressed = true;
           isShooting = false;
-          marco.stop();
+          if (!marco.isJumping) {
+              marco.stop();
+          }
           marco.run();
       }
     } else if(e.keyCode === 32) {
       if (!isShooting) {
         isShooting = true;
-        marco.stop();
+        if (!marco.isJumping) {
+          marco.stop();
+        }
         marco.shoot();
       } else {
-        marco.stop();
+        if (!marco.isJumping) {
+            marco.stop();
+        }
         marco.shooting();
       }
+    } else if(e.keyCode === 40) {
+    }else if(e.keyCode === 38) {
+      if(!marco.isJumping) {
+        marco.stop();
+        marco.jump();
+      }
     }
+
   });
 
   addEventListener('keyup',(e) => {
