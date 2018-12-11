@@ -8,8 +8,10 @@ class Init {
     /*var spaceBackground = new SpaceBackground();
     spaceBackground.init();*/
 
-    var player = new Player();
-    player.init();
+    player.stand();
+
+
+
 
     var soldier = new Soldier();
     soldier.init();
@@ -20,5 +22,7 @@ class Init {
     rebelSoldier.init();
     rebelSoldier.run();
   }
+
+
 
 }

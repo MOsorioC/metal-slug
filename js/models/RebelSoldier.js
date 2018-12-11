@@ -19,17 +19,18 @@ class RebelSoldier extends GameObject {
 
   stand() {
     this.clear();
-    var position = 0;
+    var position = 12;
     let interval = 160;
-    let diff = 33;
-
+    let diff = 40;
+    let imagen = 1;
     this.intervalID = setInterval(() => {
-      if (position < 100) {
+      if (position < 140) {
         this.context.clearRect(this.x, this.canvas.height - 140,60,75);
-        this.context.drawImage(this.img, position,this.y,35,45,this.x,this.canvas.height - 140,50,70);
+        this.context.drawImage(this.img, position - 4,this.y,40,45,this.x,this.canvas.height - 140,50,70);
         position = position + diff;
       } else {
-        position = 0;
+        imagen= 1;
+        position = 12;
       }
     }, interval);
   }
@@ -41,16 +42,16 @@ class RebelSoldier extends GameObject {
 
     this.intervalID = setInterval(() => {
 
-      this.context.clearRect(this.x, this.canvas.height - 140,60,75);
-      this.context.drawImage(this.img, position,42,40,43,this.x,this.canvas.height - 140,50,70);
+      this.context.clearRect(this.x, this.canvas.height - 140,100,100);
+      this.context.drawImage(this.img, position,42,40,43,this.x,this.canvas.height - 140,55,75);
       if (position > 0) {
         position = position - diff;
         this.x-=5;
       } else {
         position = 450;
       }
-      /*if(this.x < 200 )
-        this.stop(1);*/
+      if(this.x < 600 )
+        this.stop(1);
     }, interval);
   }
 
