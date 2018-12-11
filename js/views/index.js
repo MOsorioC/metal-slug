@@ -8,7 +8,7 @@ class Init {
     /*var spaceBackground = new SpaceBackground();
     spaceBackground.init();*/
 
-    player.stand();
+    marco.stand();
 
 
 

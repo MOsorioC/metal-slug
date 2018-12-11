@@ -1,14 +1,14 @@
 let canvas = document.querySelector('#canvas')
 let context = canvas.getContext('2d')
-let player = new Player();
-let player2 = new Player();
+let marco = new Marco();
+let tarma = new Marco();
 
 let isPressed = false;
 let isShooting = false;
 
 window.onload = function () {
 
-  player.init();
+  marco.init();
   var inicio = new Init();
 
   addEventListener('keydown', (e) => {
@@ -16,17 +16,17 @@ window.onload = function () {
       if (!isPressed) {
           isPressed = true;
           isShooting = false;
-          player.stop();
-          player.run();
+          marco.stop();
+          marco.run();
       }
     } else if(e.keyCode === 32) {
       if (!isShooting) {
         isShooting = true;
-        player.stop();
-        player.shoot();
+        marco.stop();
+        marco.shoot();
       } else {
-        player.stop();
-        player.shooting();
+        marco.stop();
+        marco.shooting();
       }
     }
   });
@@ -34,8 +34,8 @@ window.onload = function () {
   addEventListener('keyup',(e) => {
     if(e.keyCode === 39) {
       isPressed = false;
-      player.stop();
-      player.stand();
+      marco.stop();
+      marco.stand();
     }
   });
 };

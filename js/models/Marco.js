@@ -1,4 +1,4 @@
-class Player extends GameObject {
+class Marco extends GameObject {
   init() {
     this.width = 400;
     this.height = 600;
