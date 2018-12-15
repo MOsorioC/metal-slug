@@ -78,6 +78,11 @@ class Soldier extends GameObject {
     }, interval);
   }
 
+  isTouching(shot) {
+     return (this.x < shot.x + shot.width)  &&
+            (this.x + this.width > shot.x)
+  }
+
   stop(option) {
     clearInterval(this.intervalID);
     switch (option) {

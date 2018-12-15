@@ -7,18 +7,9 @@ class Shoot extends GameObject {
   }
 
   draw() {
-    this.intervalID = setInterval(() => {
-      this.x += 1;
+      this.x += 10;
       this.context.fillStyle = "black";
       this.context.fillRect(this.x, this.y + 30, 10, 10);
-
-      if(this.x > canvas.width) {
-        this.stopShoot();
-      }
-    }, 0);
   }
-
-  stopShoot() {
-    clearInterval(this.intervalID);
-  }
+  
 }

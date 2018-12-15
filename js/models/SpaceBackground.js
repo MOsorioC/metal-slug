@@ -16,10 +16,10 @@ class SpaceBackground extends GameObject {
 
   draw() {
     this.context.drawImage(this.img, this.x, this.y, this.width, this.height);
-    //this.context.drawImage(this.img, this.x + this.width, this.y, this.width, this.height)
   }
 
   drawTimer() {
+    this.context.drawImage(this.img, this.x, this.y, this.width, this.height);
 
   }
 }

@@ -4,31 +4,36 @@ let isPressed = false;
 let isShooting = false;
 let isJumping = false;
 let isPressedTarma = false;
+let marco = new Marco();
+let tarma = new Marco();
+let soldier = new Soldier();
+soldier.init();
+let soldier2 = new Soldier();
+soldier2.init();
+soldier2.stop = 300;
+soldier2.x = canvas.width + 200;
+let soldier3 = new Soldier();
+soldier3.init();
+soldier3.stop = 370;
+soldier3.x = canvas.width + 250;
+let rebelSoldier = new RebelSoldier();
+rebelSoldier.init();
+let rebelSoldier2 = new RebelSoldier();
+rebelSoldier2.init();
+rebelSoldier2.stop = 500;
+let arrayShootsMarco = [];
+let arrayShootsTarma = [];
+let arraySoldiers = [];
 
 
 window.onload = function () {
   var foo = new Sound("./assets/escape.mp3",100,true);
   foo.start();
-  //foo.stop();
-  //foo.start();
-  //foo.init(100,false);
-  //foo.remove();
-
-  let marco = new Marco();
-  let tarma = new Marco();
-  let soldier = new Soldier();
-  soldier.init();
-  let soldier2 = new Soldier();
-  soldier2.init();
-  soldier2.stop = 300;
-  soldier2.x = canvas.width + 200;
-  let soldier3 = new Soldier();
-  soldier3.init();
-  soldier3.stop = 370;
-  soldier3.x = canvas.width + 250;
-
-  let rebelSoldier = new RebelSoldier();
-  rebelSoldier.init();
+  arraySoldiers.push(soldier);
+  arraySoldiers.push(soldier2);
+  arraySoldiers.push(soldier3);
+  arraySoldiers.push(rebelSoldier);
+  arraySoldiers.push(rebelSoldier2);
   let board = new SpaceBackground();
   let intervalo
   let frames = 0;
@@ -39,13 +44,16 @@ window.onload = function () {
   function update() {
     frames++;
     context.clearRect(0, 0, canvas.width, canvas.height);
+    checkCollition();
     board.draw();
 
     marco.draw(frames);
+    drawShoots();
     tarma.draw(frames);
-    soldier.draw(frames);
+    /*soldier.draw(frames);
     soldier2.draw(frames);
-    soldier3.draw(frames);
+    soldier3.draw(frames);*/
+    initSoldiers(frames);
     rebelSoldier.draw(frames);
   }
 
@@ -62,9 +70,63 @@ window.onload = function () {
     },1000/16)
   }
 
+  function initSoldiers(frame) {
+    arraySoldiers.forEach((so) => {
+      so.draw(frame);
+    });
+  }
+
+  function drawShoots(frames) {
+    arrayShootsMarco.forEach((s) => {
+      s.draw();
+    });
+
+    arrayShootsTarma.forEach((s) => {
+      s.draw();
+    });
+  }
+
+  function checkCollition (){
+
+    for(var i = 0; i < arrayShootsMarco.length; i++) {
+      let touch = false;
+
+      for(let j = 0; j < arraySoldiers.length; j++) {
+        var soldado = arraySoldiers[j];
+        console.log(arraySoldiers);
+        if (soldado.isTouching(arrayShootsMarco[i])) {
+          touch = true;
+          arraySoldiers.splice(j,1);
+          break;
+        }
+      }
+      if (touch){
+        arrayShootsMarco.splice(i,1);
+      }
+    }
+
+
+    for(var i = 0; i < arrayShootsTarma.length; i++) {
+      let touch = false;
+
+      for(let j = 0; j < arraySoldiers.length; j++) {
+        var soldado = arraySoldiers[j];
+        console.log(soldado);
+        if (soldado.isTouching(arrayShootsTarma[i])) {
+          touch = true;
+          arraySoldiers.splice(j,1);
+          break;
+        }
+      }
+      if (touch){
+        arrayShootsTarma.splice(i,1);
+      }
+    }
+  }
+
   startGame();
   addEventListener('keydown', (e) => {
-    console.log(e.keyCode);
+
     if(e.keyCode === 39) {
       if (!isPressed) {
         isPressed = true;
@@ -75,7 +137,7 @@ window.onload = function () {
     } else if(e.keyCode === 32) {
       var shot = new Shoot();
       shot.init(marco.x + 65, marco.y);
-      marco.shoots.push(shot);
+      arrayShootsMarco.push(shot);
 
       marco.status = "shooting";
       marco.imgY = 155;
@@ -95,8 +157,7 @@ window.onload = function () {
     } else if(e.keyCode === 70){
       var shot = new Shoot();
       shot.init(tarma.x + 65, tarma.y);
-      tarma.shoots.push(shot);
-
+      arrayShootsTarma.push(shot);
       tarma.status = "shooting";
       tarma.imgY = 155;
       tarma.imagePosition = 400;
@@ -121,7 +182,6 @@ window.onload = function () {
       tarma.imgY = 0;
       tarma.imagePosition = 5;
     }
-    //marco.status = "stand";
   });
 };
 

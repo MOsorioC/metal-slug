@@ -43,7 +43,6 @@ class RebelSoldier extends GameObject {
     }
 
     if(this.status == "stand") {
-      
       this.context.drawImage(this.img, this.imagePosition - 4,this.imgY,40,45,this.x,this.canvas.height - 140,50,70);
     } else {
       this.context.drawImage(this.img, this.imagePosition,this.imgY,40,43,this.x,this.canvas.height - 140,55,75);
@@ -120,6 +119,11 @@ class RebelSoldier extends GameObject {
       }
     }, interval);
   }*/
+
+  isTouching(shot) {
+     return (this.x < shot.x + shot.width)  &&
+            (this.x + this.width > shot.x)
+  }
 
   stop(option) {
     clearInterval(this.intervalID);
