@@ -4,17 +4,53 @@ class RebelSoldier extends GameObject {
     this.width = 1128;
     this.height = 2000;
     this.x = this.canvas.width + 200;
-
+    this.imgY = 42;
+    this.imagePosition = 450;
+    this.status = "run";
+    this.diff = 41;
+    this.stop = 600;
     this.img.src = './assets/soldier/rebel.png';
     this.img.onload = function(){
       this.draw();
     }.bind(this);
   }
 
-  draw(){
-    this.context.clearRect(this.x, this.canvas.height - 140,60,75);
+  draw(frames) {
+    if (frames % 4 === 0) {
+      if(this.status == "stand") {
+
+        if (this.imagePosition < 140) {
+          this.imagePosition+=this.diff;
+        } else {
+          this.imagePosition = 12;
+        }
+      }
+    } else {
+      if(this.status == "run") {
+        this.x-=5;
+        if (this.imagePosition > 0) {
+          this.imagePosition-= this.diff;
+        } else {
+          this.imagePosition = 450;
+        }
+        if(this.x < this.stop ) {
+          this.imgY = 0;
+          this.imagePosition = 12;
+          this.status = "stand";
+          this.diff = 40;
+        }
+      }
+    }
+
+    if(this.status == "stand") {
+      
+      this.context.drawImage(this.img, this.imagePosition - 4,this.imgY,40,45,this.x,this.canvas.height - 140,50,70);
+    } else {
+      this.context.drawImage(this.img, this.imagePosition,this.imgY,40,43,this.x,this.canvas.height - 140,55,75);
+    }
+    /*this.context.clearRect(this.x, this.canvas.height - 140,60,75);
     //this.context.drawImage(this.img, this.x,this.y,35,45,200,this.canvas.height - 140,50,70);
-    this.context.drawImage(this.img, 300,this.y,35,45,this.x,this.canvas.height - 140,50,70);
+    this.context.drawImage(this.img, 300,this.y,35,45,this.x,this.canvas.height - 140,50,70);*/
   }
 
   stand() {

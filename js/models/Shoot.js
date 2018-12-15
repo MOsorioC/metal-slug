@@ -8,7 +8,6 @@ class Shoot extends GameObject {
 
   draw() {
     this.intervalID = setInterval(() => {
-      this.context.clearRect(this.x, this.y + 30,10,10);
       this.x += 1;
       this.context.fillStyle = "black";
       this.context.fillRect(this.x, this.y + 30, 10, 10);

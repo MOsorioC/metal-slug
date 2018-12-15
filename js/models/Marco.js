@@ -6,16 +6,94 @@ class Marco extends GameObject {
     this.intervalID = 0;
     this.y = this.canvas.height - 150;
     this.imgY = 0;
+    //this.imgY = 280;run
     this.img.src = './assets/marco/marco.png';
+    this.imagePosition = 5;
+    this.status = "stand";
+    this.diff = 35;
+    this.baja = false;
     this.img.onload = function(){
-      //this.stand();
+      //this.draw(10);
     }.bind(this);
     this.isJumping = false;
     this.shoots = [];
   }
 
-  draw(){
-    this.context.drawImage(this.img, this.x + 30,this.y,35,40,20,this.canvas.height - 140,50,70);
+  draw(frames){
+    if(frames % 5 === 0) {
+      if (this.status == "stand") {
+        if (this.imagePosition < 100) {
+          this.imagePosition = this.imagePosition + this.diff;
+        } else {
+          this.imagePosition = 5;
+        }
+      }
+    } else if (frames % 2 === 0) {
+      if (this.status == "run") {
+        this.moveRight();
+        if (this.imagePosition < 10){
+          this.imagePosition = 10;
+        }else if (this.imagePosition < 100) {
+          //this.context.drawImage(this.img, this.imagePosition,280,35,52,this.x,this.y,60,80);
+          this.imagePosition = this.imagePosition + 32;
+        } else if (this.imagePosition < 170) {
+          //this.context.drawImage(this.img, position - 3,280,35,52,this.x,this.y,60,80);
+          this.imagePosition = this.imagePosition + 30;
+        }else if (this.imagePosition < 230) {
+          //this.context.drawImage(this.img, this.imagePosition + 4,280,35,52,this.x,this.y,60,90);
+          this.imagePosition = this.imagePosition + 32;
+        } else {
+          this.imagePosition = -22;
+        }
+      } else if (this.status == "jump") {
+        if (this.y > 200 && !this.baja) {
+          this.y-= 10 * 2;
+        } else {
+            this.baja = true;
+            this.y+= 10 * 2;
+            if(this.y >=  this.canvas.height - 150){
+              this.baja = false;
+              this.status = "stand";
+              this.imgY = 0;
+              marco.imagePosition = 5;
+            }
+        }
+      } else if (this.status == "shooting") {
+          if (this.imagePosition < 450){
+            this.imagePosition = 450;
+          }
+          else if (this.imagePosition < 600) {
+            this.imagePosition = this.imagePosition + 55;
+          } else if(this.imagePosition < 750) {
+            this.imagePosition = this.imagePosition + 42;
+          }else if(this.imagePosition < 790){
+            this.imagePosition = this.imagePosition + 42;
+          } else {
+            this.status = "stand";
+            this.imgY = 0;
+            this.imagePosition = 5;
+          }
+      }
+    }
+
+    if (this.status == "run") {
+      this.run();
+    } else if(this.status == "stand"){
+      this.context.drawImage(this.img, this.imagePosition,this.imgY,35,52,this.x,this.y,60,80);
+    } else if(this.status == "jump"){
+      //this.context.drawImage(this.img, this.imagePosition,this.imgY,35,52,this.x,this.y,60,80);
+      this.context.drawImage(this.img, this.imagePosition,this.imgY,35,52,this.x,this.y,60,80);
+    } else if(this.status == "shooting") {
+      this.shoot();
+    } else {
+      this.context.drawImage(this.img, this.imagePosition,this.imgY,35,52,this.x,this.y,60,80);
+    }
+    //
+    //this.context.drawImage(this.img, this.imagePosition,this.imgY,35,52,this.x,this.y,60,80);
+  }
+
+  moveRight() {
+    this.x+=8;
   }
 
   stand() {
@@ -38,27 +116,13 @@ class Marco extends GameObject {
   }
 
   run() {
-    var position = 10;
-    let interval = 1000/14;
-    let diff = 32;
-    //this.context.drawImage(this.img, position,280,35,52,200,this.canvas.height - 140,50,70);
-    this.intervalID = setInterval(() => {
-      this.context.clearRect(this.x, this.y,100,100);
-      this.x+=8;
-      if (position < 100) {
-        this.context.drawImage(this.img, position,280,35,52,this.x,this.y,60,80);
-        position = position + diff;
-      } else if (position < 190) {
-        this.context.drawImage(this.img, position - 3,280,35,52,this.x,this.y,60,80);
-        position = position + 30;
-      }else if (position < 230) {
-        this.context.drawImage(this.img, position + 4,280,35,52,this.x,this.y,60,90);
-        position = position + 32;
-      } else {
-        position = 10;
+      if (this.imagePosition < 100) {
+        this.context.drawImage(this.img, this.imagePosition,280,35,52,this.x,this.y,60,80);
+      } else if (this.imagePosition < 190) {
+        this.context.drawImage(this.img, this.imagePosition - 3,280,35,52,this.x,this.y,60,80);
+      }else if (this.imagePosition < 230) {
+        this.context.drawImage(this.img, this.imagePosition + 4,280,35,52,this.x,this.y,60,90);
       }
-
-    }, interval);
   }
 
   jump() {
@@ -68,8 +132,7 @@ class Marco extends GameObject {
     let xPrite = 225;
     this.isJumping = true;
     this.intervalID = setInterval(() => {
-
-      this.context.clearRect(this.x, this.y,100,100);
+      //this.context.clearRect(this.x, this.y,100,100);
       this.y-= 10 * 2;
       this.context.drawImage(this.img, position,xPrite,35,52,this.x,this.y,60,80);
       if (this.y < 200 ) {
@@ -85,18 +148,27 @@ class Marco extends GameObject {
     let diff = 32;
     let xPrite = 225;
     this.intervalID = setInterval(() => {
-      this.context.clearRect(this.x, this.y,100,100);
+      //this.context.clearRect(this.x, this.y,100,100);
       this.y+= 10 * 2;
       this.context.drawImage(this.img, position,xPrite,35,52,this.x,this.y,60,80);
       if (this.y >=  this.canvas.height - 150){
         this.isJumping = false;
         this.stop();
-        this.stand();
+        this.status = "stand";
+        //this.stand();
       }
     }, interval);
   }
-
   shoot() {
+    if (this.imagePosition < 600) {
+      this.context.drawImage(this.img, this.imagePosition,this.imgY,60,80,this.x,this.y,90,120);
+    } else if(this.imagePosition < 750) {
+      //this.context.drawImage(this.img, this.imagePosition + 5,this.imgY,40,60,this.x,this.y,60,90);
+    }else if(this.imagePosition < 790){
+      //this.context.drawImage(this.img, this.imagePosition,this.imgY,40,60,this.x,this.y,60,90);
+    }
+  }
+  /*shoot() {
     if (!this.isJumping) {
       let position = 8;
       let interval = 1000/14;
@@ -115,7 +187,7 @@ class Marco extends GameObject {
         }
       }, interval);
     }
-  }
+  }*/
 
   shooting() {
     if (!this.isJumping)
