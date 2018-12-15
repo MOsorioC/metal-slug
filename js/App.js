@@ -24,23 +24,26 @@ rebelSoldier2.stop = 500;
 let arrayShootsMarco = [];
 let arrayShootsTarma = [];
 let arraySoldiers = [];
+let board = new SpaceBackground();
+let intervalo
+let frames = 0;
 
 
 window.onload = function () {
-  var foo = new Sound("./assets/escape.mp3",100,true);
-  foo.start();
-  arraySoldiers.push(soldier);
-  arraySoldiers.push(soldier2);
-  arraySoldiers.push(soldier3);
-  arraySoldiers.push(rebelSoldier);
-  arraySoldiers.push(rebelSoldier2);
-  let board = new SpaceBackground();
-  let intervalo
-  let frames = 0;
-  board.init();
-  marco.init();
-  tarma.init();
-  tarma.x = 80;
+  function initGame() {
+    var foo = new Sound("./assets/escape.mp3",100,true);
+    foo.start();
+    arraySoldiers.push(soldier);
+    arraySoldiers.push(soldier2);
+    arraySoldiers.push(soldier3);
+    arraySoldiers.push(rebelSoldier);
+    arraySoldiers.push(rebelSoldier2);
+    board.init();
+    marco.init();
+    tarma.init();
+    tarma.x = 80;
+  }
+
   function update() {
     frames++;
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -63,6 +66,8 @@ window.onload = function () {
   }
 
   function startGame() {
+    initGame();
+
     if(intervalo > 0) return
 
     intervalo = setInterval(function() {
@@ -125,6 +130,7 @@ window.onload = function () {
   }
 
   startGame();
+
   addEventListener('keydown', (e) => {
 
     if(e.keyCode === 39) {
