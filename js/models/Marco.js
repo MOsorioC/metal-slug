@@ -55,7 +55,7 @@ class Marco extends GameObject {
               this.baja = false;
               this.status = "stand";
               this.imgY = 0;
-              marco.imagePosition = 5;
+              this.imagePosition = 5;
             }
         }
       } else if (this.status == "shooting") {
@@ -82,7 +82,7 @@ class Marco extends GameObject {
       this.context.drawImage(this.img, this.imagePosition,this.imgY,35,52,this.x,this.y,60,80);
     } else if(this.status == "jump"){
       //this.context.drawImage(this.img, this.imagePosition,this.imgY,35,52,this.x,this.y,60,80);
-      this.context.drawImage(this.img, this.imagePosition,this.imgY,35,52,this.x,this.y,60,80);
+      this.jump();
     } else if(this.status == "shooting") {
       this.shoot();
     } else {
@@ -93,7 +93,7 @@ class Marco extends GameObject {
   }
 
   moveRight() {
-    this.x+=8;
+  this.x = Math.min(this.x + 8, this.canvas.width - 60);
   }
 
   stand() {
@@ -127,14 +127,14 @@ class Marco extends GameObject {
 
   jump() {
     let position = 8;
-    let interval = 50;
+    let interval = 100;
     let diff = 32;
     let xPrite = 225;
     this.isJumping = true;
     this.intervalID = setInterval(() => {
-      //this.context.clearRect(this.x, this.y,100,100);
       this.y-= 10 * 2;
       this.context.drawImage(this.img, position,xPrite,35,52,this.x,this.y,60,80);
+      console.log(this.y);
       if (this.y < 200 ) {
         this.jumpDown();
       }

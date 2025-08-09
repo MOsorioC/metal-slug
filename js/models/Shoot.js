@@ -1,15 +1,33 @@
 class Shoot extends GameObject {
-  init( positionX, positionY) {
+  init(positionX, positionY) {
     this.x = positionX;
     this.y = positionY;
-    this.intervalID = 0;
-    this.draw();
+    this.width = 10;
+    this.height = 10;
+    this.speed = 600; // px per second
+    this.active = true;
+  }
+
+  update(delta) {
+    if (!this.active) return;
+    this.x += this.speed * delta;
+    if (this.x > this.canvas.width + 40) {
+      this.active = false; // auto deactivate
+    }
   }
 
   draw() {
-      this.x += 10;
-      this.context.fillStyle = "black";
-      this.context.fillRect(this.x, this.y + 30, 10, 10);
+    if (!this.active) return;
+  this.context.fillStyle = '#ffd200';
+  this.context.fillRect(this.x, this.y, this.width+2, this.height+2);
   }
-  
+
+  activate(x,y) {
+    // reuse bullet from pool
+    this.x = x;
+  this.y = y; // now direct draw without extra offset
+    this.active = true;
+  // optional: reset size if changed
+  this.width = 10; this.height = 10;
+  }
 }

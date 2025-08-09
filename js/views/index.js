@@ -1,13 +1,1 @@
-class Init {
-  constructor() {
-    this.startGame();
-  }
-
-  startGame() {
-
-    marco.stand();
-  }
-
-
-
-}
+// Legacy Init removed. Player stand state handled internally.
