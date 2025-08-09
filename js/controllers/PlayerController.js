@@ -11,7 +11,10 @@ class PlayerController {
 			this.keys.add(code);
 			switch(code) {
 				case 'ArrowRight':
-					this.p1.startRun();
+					this.p1.startRunRight();
+				break;
+				case 'ArrowLeft':
+					this.p1.startRunLeft();
 				break;
 				case 'Space':
 					e.preventDefault();
@@ -37,7 +40,12 @@ class PlayerController {
 			this.keys.delete(code);
 			switch(code) {
 				case 'ArrowRight':
-					this.p1.stand();
+					// if still holding left, keep moving left; else stop
+					if (this.keys.has('ArrowLeft')) this.p1.startRunLeft(); else this.p1.stand();
+				break;
+				case 'ArrowLeft':
+					// if still holding right, keep moving right; else stop
+					if (this.keys.has('ArrowRight')) this.p1.startRunRight(); else this.p1.stand();
 				break;
 				// P2 stand removed
 			}
