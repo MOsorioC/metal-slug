@@ -7,23 +7,39 @@ class RebelSoldier extends GameObject {
     this.imagePosition = 450;
     this.status = 'run';
     this.stop = 600;
-    this.frameStep = 41;
+    this.frameStep = 41; // sprite sheet horizontal delta
+    // Timing (seconds per frame) - slowed similar to Soldier
+    this.runFrameDuration = 0.18;
+    this.standFrameDuration = 0.6;
+    this.frameAccumulator = 0;
     this.img.src = './assets/soldier/rebel.png';
   }
 
   update(delta, frame) {
+    this.frameAccumulator += delta;
     if (this.status === 'run') {
-      this.x -= (this.speed || 5);
-      this.imagePosition -= this.frameStep;
-      if (this.imagePosition <= 0) this.imagePosition = 450;
+      // Convert legacy per-frame speed to px/s, then slow 50%
+      const raw = (this.speed || 5);
+      const pxPerSecond = raw * 60 * 0.5;
+      this.x -= pxPerSecond * delta;
+
+      while (this.frameAccumulator >= this.runFrameDuration) {
+        this.imagePosition -= this.frameStep;
+        if (this.imagePosition <= 0) this.imagePosition = 450;
+        this.frameAccumulator -= this.runFrameDuration;
+      }
       if (this.x < this.stop) {
         this.status = 'stand';
         this.imgY = 0;
         this.imagePosition = 12;
+        this.frameAccumulator = 0;
       }
-    } else if (this.status === 'stand' && frame % 4 === 0) {
-      this.imagePosition += this.frameStep;
-      if (this.imagePosition > 140) this.imagePosition = 12;
+    } else if (this.status === 'stand') {
+      if (this.frameAccumulator >= this.standFrameDuration) {
+        this.imagePosition += this.frameStep;
+        if (this.imagePosition > 140) this.imagePosition = 12;
+        this.frameAccumulator = 0;
+      }
     }
   }
 
