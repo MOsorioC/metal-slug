@@ -3,9 +3,13 @@ class Player extends GameObject {
     super();
     this.type = type; // 'marco' | 'tarma'
     this.spritePath = `./assets/${type}/${type}.png`;
+    this.spriteLeftPath = `./assets/${type}/${type}-t.png`;
     this.img.src = this.spritePath;
+    this.imgAlt = new Image();
+    this.imgAlt.src = this.spriteLeftPath;
     this.status = 'stand';
-    this.imagePosition = 5;
+    this.imagePosition = 9;
+    this.imagePositionLeft = 880;
     this.imgY = 0;
     this.frameAccumulator = 0; // for timing inside requestAnimationFrame
     this.groundY = this.canvas.height - 150;
@@ -15,20 +19,21 @@ class Player extends GameObject {
     this.height = 52; // frame height (source)
     this.vx = 0;
     this.vy = 0;
-  this.gravity = 800; // px/s^2 (slightly less for smoother arc)
-  this.jumpSpeed = 420; // initial vy (lower for visible jump)
+    this.gravity = 800; // px/s^2 (slightly less for smoother arc)
+    this.jumpSpeed = 420; // initial vy (lower for visible jump)
     this.shootCooldown = 0; // seconds
-  this.muzzleOffsetX = 65;
-  this.muzzleOffsetY = 30; // vertical offset so bullet appears lower (hand level)
-  	this.movingRight = false;
-  	this.movingLeft = false;
-  	this.facing = 1; // 1 right, -1 left
+    this.muzzleOffsetX = 65;
+    this.muzzleOffsetY = 30; // vertical offset so bullet appears lower (hand level)
+    this.movingRight = false;
+    this.movingLeft = false;
+    this.facing = 1; // 1 right, -1 left
   }
 
   init() {
     // Reset to default starting state (mirrors constructor baseline)
     this.status = 'stand';
-    this.imagePosition = 5;
+    this.imagePosition = 9;
+    this.imagePositionLeft = 880;
     this.imgY = 0;
     this.vx = 0;
     this.vy = 0;
@@ -65,7 +70,9 @@ class Player extends GameObject {
       if (this.status !== 'run') {
         this.status = 'run';
         this.imgY = 280;
-        this.imagePosition = -22;
+        // initialize left-run sprite track
+        this.imagePositionLeft = 880;
+        this.imagePosition = -22; // keep right index untouched for symmetry
         this.frameAccumulator = 0;
       }
     }
@@ -75,28 +82,36 @@ class Player extends GameObject {
     if (this.status === 'jump') return;
     this.status = 'jump';
     this.imgY = 225;
-    this.imagePosition = 8;
+    this.imagePosition = 9;
     this.vy = -this.jumpSpeed; // upward
-  this.frameAccumulator = 0;
-  console.log('[DEBUG] jump start vy', this.vy);
+    this.frameAccumulator = 0;
   }
 
   startShooting() {
     if (this.status === 'shooting' || this.shootCooldown > 0) return;
     this.status = 'shooting';
     this.imgY = 155;
-    this.imagePosition = 450;
+    if (this.facing === -1) {
+      // start from the right-most shooting frame on the left-facing sheet
+      this.imagePositionLeft = 790;
+    } else {
+      this.imagePosition = 450;
+    }
     this.shootCooldown = 0.25; // quarter second before allowing another trigger
-  this.frameAccumulator = 0;
+    this.frameAccumulator = 0;
   }
 
   stand() {
-  this.movingRight = false;
-  this.movingLeft = false;
+    this.movingRight = false;
+    this.movingLeft = false;
     if (this.status !== 'stand' && this.status !== 'shooting' && this.status !== 'jump') {
       this.status = 'stand';
       this.imgY = 0;
-      this.imagePosition = 5;
+      if (this.facing === -1) {
+        this.imagePositionLeft = 880;
+      } else {
+        this.imagePosition = 9;
+      }
       this.vx = 0;
       this.frameAccumulator = 0;
     }
@@ -128,8 +143,7 @@ class Player extends GameObject {
       // final fallback legacy array passed in
       const shot = new Shoot(); shot.init(this.x + offsetX, this.y + offsetY, dir); shotsArray && shotsArray.push(shot);
     }
-  console.log('[DEBUG] fire called type', this.type);
-  this.startShooting();
+    this.startShooting();
   }
 
   getMuzzleOffset() {
@@ -143,9 +157,9 @@ class Player extends GameObject {
     if (this.shootCooldown > 0) this.shootCooldown = Math.max(0, this.shootCooldown - delta);
     // Use delta-based accumulator for smoother animation
     this.frameAccumulator += delta;
-  const runFrameTime = 0.15; // slower animation
-  const shootFrameTime = 0.09;
-  const idleFrameTime = 0.5;
+    const runFrameTime = 0.15; // slower animation
+    const shootFrameTime = 0.09;
+    const idleFrameTime = 0.5;
 
     // Movement applies based on flags irrespective of animation (allows shooting/jumping while moving)
     if (this.movingRight) {
@@ -155,17 +169,30 @@ class Player extends GameObject {
     }
     if (this.status === 'run') {
       while (this.frameAccumulator >= runFrameTime) {
-        this.advanceRunFrame();
+        if (this.facing === -1) {
+          this.advanceRunFrameLeft();
+        } else {
+          this.advanceRunFrame();
+        }
         this.frameAccumulator -= runFrameTime;
       }
     } else if (this.status === 'shooting') {
       while (this.frameAccumulator >= shootFrameTime) {
-        this.advanceShootFrame();
+        if (this.facing === -1) {
+          this.advanceShootFrameLeft();
+        } else {
+          this.advanceShootFrame();
+        }
         this.frameAccumulator -= shootFrameTime;
       }
     } else if (this.status === 'stand') {
       if (this.frameAccumulator >= idleFrameTime) {
-        if (this.imagePosition < 100) this.imagePosition += 35; else this.imagePosition = 5;
+        if (this.facing === -1) {
+          // idle loop for left-facing sprite sheet
+          if (this.imagePositionLeft > 780) this.imagePositionLeft -= 35; else this.imagePositionLeft = 880;
+        } else {
+          if (this.imagePosition < 100) this.imagePosition += 35; else this.imagePosition = 9;
+        }
         this.frameAccumulator = 0;
       }
     }
@@ -184,7 +211,7 @@ class Player extends GameObject {
       this.y = this.groundY - 180;
       if (this.vy < 0) this.vy = 0; // start falling
     }
-  // clamp floor
+    // clamp floor
     if (this.y >= this.groundY) {
       this.y = this.groundY;
       this.vy = 0;
@@ -192,9 +219,12 @@ class Player extends GameObject {
       if (this.status === 'jump') {
         this.status = 'stand';
         this.imgY = 0;
-        this.imagePosition = 5;
+        if (this.facing === -1) {
+          this.imagePositionLeft = 880;
+        } else {
+          this.imagePosition = 9;
+        }
         this.frameAccumulator = 0;
-        console.log('[DEBUG] landed');
       }
     }
   }
@@ -210,6 +240,21 @@ class Player extends GameObject {
       this.imagePosition += 32;
     } else {
       this.imagePosition = -22; // loop
+    }
+  }
+
+  advanceRunFrameLeft() {
+    if (this.imagePositionLeft > 875) {
+      this.imagePositionLeft = 875;
+    } else if (this.imagePositionLeft > 780) {
+      this.imagePositionLeft -= 32;
+    } else if (this.imagePositionLeft > 710) {
+      this.imagePositionLeft -= 30;
+    } else if (this.imagePositionLeft > 650) {
+      this.imagePositionLeft -= 32;
+    } else {
+      // loop back to start of left-run strip
+      this.imagePositionLeft = 880;
     }
   }
 
@@ -231,20 +276,46 @@ class Player extends GameObject {
       } else {
         this.status = 'stand';
         this.imgY = 0;
-        this.imagePosition = 5;
+        this.imagePosition = 9;
+      }
+      this.frameAccumulator = 0;
+    }
+  }
+
+  // Left-facing shooting frames: mirror the right-sheet progression using imgAlt indices decreasing
+  advanceShootFrameLeft() {
+    if (this.imagePositionLeft > 750) {
+      // start clamped to the first segment end (mirrors 450 on right-sheet)
+      this.imagePositionLeft = 750;
+    } else if (this.imagePositionLeft > 600) {
+      this.imagePositionLeft -= 55; // mirror of +55
+    } else if (this.imagePositionLeft > 550) {
+      this.imagePositionLeft -= 42; // mirror of +42
+    } else if (this.imagePositionLeft > 510) {
+      this.imagePositionLeft -= 42; // final narrow segment
+    } else {
+      // end shooting: return to run if still moving, else stand (left-facing)
+      if (this.movingRight || this.movingLeft) {
+        this.status = 'run';
+        this.imgY = 280;
+        this.imagePositionLeft = 880; // reset left run strip start
+      } else {
+        this.status = 'stand';
+        this.imgY = 0;
+        this.imagePositionLeft = 880; // reset left idle start
       }
       this.frameAccumulator = 0;
     }
   }
 
   draw() {
-  	let destY = this.y;
+    let destY = this.y;
     const ctx = this.context;
     const facingLeft = this.facing === -1;
-    if (this.status === 'shooting' && this.imagePosition < 600) {
+  if (this.status === 'shooting' && ((facingLeft && this.imagePositionLeft > 600) || (!facingLeft && this.imagePosition < 600))) {
       // wide shooting frame: draw 90x120
       if (facingLeft) {
-        ctx.drawImage(this.img, this.imagePosition, this.imgY, 60, 80, this.x + 90, destY, -90, 120);
+    ctx.drawImage(this.imgAlt, this.imagePositionLeft, this.imgY, 60, 80, this.x + 90, destY, -90, 120);
       } else {
         ctx.drawImage(this.img, this.imagePosition, this.imgY, 60, 80, this.x, destY, 90, 120);
       }
@@ -252,9 +323,9 @@ class Player extends GameObject {
     }
     // normal frame: draw 60x80
     if (facingLeft) {
-      ctx.drawImage(this.img, this.imagePosition, this.imgY, 35, 52, this.x + 60, destY, -60, 80);
+      ctx.drawImage(this.imgAlt, this.imagePositionLeft, this.imgY, 30, 52, this.x + 60, destY, -60, 80);
     } else {
-      ctx.drawImage(this.img, this.imagePosition, this.imgY, 35, 52, this.x, destY, 60, 80);
+      ctx.drawImage(this.img, this.imagePosition, this.imgY, 30, 52, this.x, destY, 60, 80);
     }
   }
 }
