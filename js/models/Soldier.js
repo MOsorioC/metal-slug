@@ -15,6 +15,9 @@ class Soldier extends GameObject {
     this.runFrameDuration = 0.18; // was effectively every frame
     this.standFrameDuration = 0.6;
     this.frameAccumulator = 0;
+  // shooting logic
+  this.shootInterval = 2; // seconds between shots
+  this.shootTimer = this.shootInterval; // start counting down
     this.img.src = './assets/soldier/soldier.png';
   }
 
@@ -22,7 +25,7 @@ class Soldier extends GameObject {
     // accumulate time for animation frames
     this.frameAccumulator += delta;
 
-    if (this.status === 'run') {
+  if (this.status === 'run') {
       // Convert legacy small speed (value per frame) into px/s, then halve for slower motion
       const raw = (this.speed || 5); // legacy value intended per frame
       const pxPerSecond = raw * 60 * 0.5; // scale by 60fps assumption & slow by 50%
@@ -39,12 +42,22 @@ class Soldier extends GameObject {
         this.imgY = 0;
         this.imagePosition = 0;
         this.frameAccumulator = 0;
+        this.shootTimer = this.shootInterval; // reset so first shot happens after full interval while standing
       }
     } else if (this.status === 'stand') {
       if (this.frameAccumulator >= this.standFrameDuration) {
         this.imagePosition += this.frameSpeedStand;
         if (this.imagePosition > 100) this.imagePosition = 0;
         this.frameAccumulator = 0;
+      }
+    }
+
+    // handle shooting only while standing
+    if (this.status === 'stand') {
+      this.shootTimer -= delta;
+      if (this.shootTimer <= 0) {
+        this.fireEnemyShot();
+        this.shootTimer += this.shootInterval; // reset preserving any negative remainder
       }
     }
   }
@@ -66,5 +79,23 @@ class Soldier extends GameObject {
       top < (shot.y + shot.height) &&
       bottom > shot.y
     );
+  }
+
+  fireEnemyShot() {
+    // find or create a bullet from the shared pool; fallback to global bulletPool or state
+    const pool = (typeof state !== 'undefined' && state.bulletPool) ? state.bulletPool : (typeof bulletPool !== 'undefined' ? bulletPool : null);
+    if (!pool) return;
+    const offsetX = -10; // spawn slightly to the left of sprite
+    const spawnY = this.canvas.height - 140 + 25; // mid-height of enemy
+    let bullet = pool.find(b => !b.active);
+    if (bullet) {
+      bullet.activate(this.x + offsetX, spawnY, -1);
+      bullet.owner = 'enemy';
+    } else {
+      bullet = new Shoot();
+      bullet.init(this.x + offsetX, spawnY, -1);
+      bullet.owner = 'enemy';
+      pool.push(bullet);
+    }
   }
 }
